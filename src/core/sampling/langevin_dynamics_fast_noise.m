@@ -1,4 +1,4 @@
-function syn_mat = langevin_dynamics_fast(config, net, syn_mat)
+function syn_mat = langevin_dynamics_fast_noise(config, net, syn_mat)
 % the input syn_mat should be a 4-D matrix
 % syn_mat = gpuArray(syn_mat);
 % net = vl_simplenn_move(net, 'gpu') ;
@@ -19,7 +19,6 @@ for t = 1:config.T
     % part1: derivative on f(I; w)  part2: gaussian I
     syn_mat = syn_mat + config.Delta1 * config.Delta1 /2 * res(1).dzdx ...  
         - config.Delta1 * config.Delta1 /2 /config.refsig1 / config.refsig1 * syn_mat;
-    
     % part3: white noise N(0, 1)     
     syn_mat = syn_mat + config.Delta1 * gpuArray(randn(size(syn_mat), 'single'));
     clear res;

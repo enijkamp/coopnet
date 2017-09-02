@@ -1,12 +1,18 @@
-function [net1, net2, config] = learn_dualNets(category, exp_type)
+function [net1, net2, config] = learn_dualNets(category, exp_type, num_imgs)
 
 rng(1);
 
 learningTime = tic;
 
 fprintf('Learning category: %s\n', category);
-
-config = frame_config(category, 'em', exp_type);
+Delta2 = 0.0000003;
+refsig2 = 0.00001;
+gamma2 =  0.0003;
+% for i=1:2
+%     refsig2 = refsig2 / 10;
+%     for j = 1:4
+%         Delta2 = Delta2 / 10;
+config = frame_config(category, 'em', exp_type, num_imgs, Delta2, refsig2, gamma2);
 
 
 %% Setup Network 2
@@ -86,7 +92,7 @@ clear res;
 clear img;
 
 %% Step 2 create imdb
-[imdb, getBatch, net1] = create_imdb(config, net1);
+[imdb, getBatch, net1] = create_imdb(config, net1, num_imgs);
 
 %% Step 4: training
 [net1, net2, config] = train_model_dual(config, net1, net2, imdb, getBatch, 1);
@@ -98,3 +104,5 @@ learningTime = mod(learningTime, 3600);
 mins = floor(learningTime / 60);
 secds = mod(learningTime, 60);
 fprintf('total learning time is %d hours / %d minutes / %.2f seconds.\n', hrs, mins, secds);
+%     end
+end

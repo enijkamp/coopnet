@@ -1,4 +1,4 @@
-function [] = draw_figures(config, syn_mat, iter, mean_img, SSD, layer, prefix)
+function [] = draw_figures(config, syn_mat, iter, mean_img, SSD, layer, prefix, c)
 
 if nargin < 7
     prefix = '';
@@ -12,12 +12,12 @@ for i = 1:size(syn_mat_norm, 4)
     imwrite(syn_mat_norm(:,:,:,i), [config.figure_folder, prefix, num2str(layer, 'layer_%02d_'), num2str(i, '%03d.png')]);
 end
 
-imwrite(I_syn, [config.Synfolder, prefix, num2str(layer, 'layer_%02d_'), num2str(iter, 'dense_original_%04d'), '.png']);
-
+imwrite(I_syn, [config.Synfolder, prefix, num2str(layer, 'layer_%02d_'), num2str(c),num2str(iter, 'dense_original_%04d'), '.png']);
 
 if ~isempty(SSD)
     plot(1:iter, SSD(1:iter), 'r', 'LineWidth', 3);
-    axis([min(iter, 1), iter+1, 0,  max(SSD(min(iter, 1):end)) * 1.2]);
+    % axis([min(iter, 1), iter+1, 0,  max(SSD(min(iter, 1):end)) * 1.2]);
+    axis([min(iter, 1), iter+1, 0,  10]);
     title('Matched statistics')
     drawnow;
 end

@@ -3,7 +3,7 @@ net.layers = [];
 opts.scale = 2 ;
 opts.initBias = 0.1 ;
 opts.weightDecay = 1 ;
-opts.weightInitMethod = 'gaussian' ;
+opts.weightInitMethod = 'xavier' ;
 opts.batchNormalization = true;
 opts.addrelu = false;
 opts.type = 'convt';
@@ -11,7 +11,7 @@ opts.leak = 0.2;
 
 %% layer 1
 layer_name = '1';
-num_in = 2;
+num_in = 100;
 num_out = 512;
 filter_sz = 4; 
 upsample = 1; 

@@ -1,18 +1,20 @@
 function [] = visualize_filters(config, im, net, save_dir, start_layer)
 
+
+if nargin < 3
+    model_file = '/media/vclagpu/Data1/ruiqi/CoopNet_64_all/code/working/school_bus_1000_dense_em/layer_01_iter_400_model.mat';
+    load(model_file);
+end
+
+net = net1;
 if nargin < 2
-    im = single(imread('/home/yanglu/Projects/autoEncoder/Image/codebook/ostrich/n01518878_94.JPEG'));
+    im = single(imread('/media/vclagpu/Data1/ruiqi/image/school_bus/n04146614_2022.JPEG'));
     im = imresize(im, net.normalization.imageSize(1:2));
     im = im - net.normalization.averageImage;
 end
 
-if nargin < 3
-    model_file = '/home/yanglu/Projects/autoEncoder/release_1.3/working/codebook/ostrich_dense_net_frame_3_cd_e2e/layer_01_iter_2000_model.mat';
-    load(model_file);
-end
-
 if nargin < 4
-    save_dir = '/home/yanglu/Projects/autoEncoder/release_1.3/figure/filter/';
+    save_dir = '/media/vclagpu/Data1/ruiqi/CoopNet_64_all/code/filters/';
 end
 
 if nargin < 5

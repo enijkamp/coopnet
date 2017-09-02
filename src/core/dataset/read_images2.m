@@ -1,8 +1,7 @@
 function [img_mat, net] = read_images2(config, net)
 
-img_file = [config.working_folder, 'images.mat'];
+img_file = [config.inPath, '/images.mat'];
 files = dir([config.inPath '/*.jpg']);
-files = files(1:12000);
 
 if isempty(files)
    files = dir([config.inPath '*.JPEG']); 
@@ -16,10 +15,11 @@ if isempty(files)
     keyboard;
 end
 
+files = files(1:100);
 numImages = 0;
 
 %% temp
-    img_file = '/media/vclagpu/Data1/yanglu/AutoEncoder/gan_1.3_0.5/working/codebook/celebA_dense_net_frame_gan_3_mask/images.mat';
+%     img_file = '/media/vclagpu/Data1/yanglu/AutoEncoder/gan_1.3_0.5/working/codebook/celebA_dense_net_frame_gan_3_mask/images.mat';
 %% end_temp
 
 if exist(img_file, 'file') && ~config.force_learn

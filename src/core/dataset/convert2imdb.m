@@ -6,7 +6,7 @@ end
 numImages = size(img_mat, 4);
 imdb.images.data = img_mat ;
 imdb.images.set = ones(1, numImages);
-imdb.images.set(10001:end) = 2;
+% imdb.images.set(10001:end) = 2;
 imdb.meta.sets = {'train', 'val', 'test'} ;
 
 if(~isempty(masks))

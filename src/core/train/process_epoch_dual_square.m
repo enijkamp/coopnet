@@ -1,4 +1,4 @@
-function  [net1, net2, config, syn_mats, z_mats] = process_epoch_dual(opts, config, getBatch, epoch, subset, learningRate, imdb, net1, net2)
+function  [net1, net2, config, syn_mats, z_mats] = process_epoch_dual_square(opts, config, getBatch, epoch, subset, learningRate, imdb, net1, net2)
 % -------------------------------------------------------------------------
 
 % move CNN to GPU as needed
@@ -46,11 +46,14 @@ for t=1:opts.batchSize:numel(subset)
         end
         
         im = gpuArray(im);
-        
+        % net1: descriptor
+        % net2: generator
         cell_idx = (ceil(t / opts.batchSize) - 1) * numlabs + labindex;
         % Step 1: Inference Network 2 -- generate Z
+        % G0: generate Xi
         z_mats{cell_idx} = randn([config.z_sz, num_syn], 'single');
         z = gpuArray(z_mats{cell_idx});
+        % D1: generate Yi
         syn_mat = vl_gan(net2, z, [], [],...
             'accumulate', s ~= 1, ...
             'disableDropout', ~training, ...
@@ -60,9 +63,16 @@ for t=1:opts.batchSize:numel(subset)
             'cudnn', opts.cudnn) ;
         syn_mat = syn_mat(end).x;        
         
-        % Step 2: Inference Network 1 -- generate synthesized images           
+        % Step 2: Inference Network 1 -- generate synthesized images   
+        % D1: generate y wave i
         syn_mat = langevin_dynamics_fast(config, net1, syn_mat);
         syn_mats{cell_idx} = gather(syn_mat);
+        
+        % G1: Y wave - syn_mat
+        % Xj - z
+        % run langevin IG steps to update z
+        z = langevin_dynamics_generator(config, net2, z, syn_mat);
+%         zs{cell_idx} = gather(z);
         
         % Step 3: Learning Net1
         numImages = size(im, 4);
@@ -86,6 +96,7 @@ for t=1:opts.batchSize:numel(subset)
             'cudnn', opts.cudnn);
         
         % Step 4: Learning Net2
+        % res = vl_gan(net, x, dzdy, res, varargin)
         res2 = vl_gan(net2, z, syn_mat, res2, ...
             'accumulate', s ~= 1, ...
             'disableDropout', ~training, ...

@@ -1,8 +1,11 @@
-function [imdb, getBatch, net] = create_imdb(config, net)
+function [imdb, getBatch, net] = create_imdb(config, net, num_imgs)
 
 switch config.datatype
     case 'small'
-        [img_mat, net] = read_images(config, net);
+        [img_mat, net] = read_images(config, net, num_imgs);
+        [imdb, getBatch] = convert2imdb(img_mat);
+    case 'all'
+        [img_mat] = read_images_all(num_imgs);
         [imdb, getBatch] = convert2imdb(img_mat);
     case 'celebA'
         [img_mat, net] = read_images2(config, net);

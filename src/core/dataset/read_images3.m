@@ -1,6 +1,6 @@
 function [img_mat, masks] = read_images3(config, net)
 
-img_file = [config.working_folder, 'images.mat'];
+img_file = [config.inPath, '/images.mat'];
 files = dir([config.inPath '/*.jpg']);
 
 
@@ -13,9 +13,10 @@ end
 
 if isempty(files)
     fprintf('error: No training images are found\n');
-    keyboard;
+   keyboard;
 end
 
+files = files(1:100);
 numImages = 0;
 
 if exist(img_file, 'file') && ~config.force_learn

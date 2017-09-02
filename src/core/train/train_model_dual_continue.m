@@ -1,4 +1,4 @@
-function [net1, net2, config] = train_model_dual(config, net1, net2, imdb, getBatch, layer)
+function [net1, net2, config] = train_model_dual_continue(config, net1, net2, imdb, getBatch, layer, siter)
 
 rate_list2 = logspace(-2, -4, 80)*100;
 learningRate_array2 = repmat(rate_list2 , max(1,floor(1000 / length(rate_list2))),1); %logspace(-2, -4, 60) ones(1,60, 'single')
@@ -32,8 +32,8 @@ if isnan(opts.train), opts.train = [] ; end
 opts.batchSize = min(opts.batchSize, numel(opts.train));
 opts.numEpochs = config.nIteration;
 
-net1 = initialize_momentum(net1);
-net2 = initialize_momentum(net2);
+% net1 = initialize_momentum(net1);
+% net2 = initialize_momentum(net2);
 
 interval = 10;
 SSD = zeros(opts.numEpochs, 1);
@@ -53,6 +53,7 @@ elseif numGpus == 1
 end
 
 if exist(opts.memoryMapFile), delete(opts.memoryMapFile) ; end
+% config.force_learn = false;
 
 % -------------------------------------------------------------------------
 %                           Train and validate
@@ -65,43 +66,45 @@ if exist(model_file, 'file') && config.force_learn == false;
     load(model_file);
 else
     h = figure;
-    for epoch=1:opts.numEpochs
+    for epoch=siter+1:opts.numEpochs
         fprintf('Iteration %d / %d\n', epoch, opts.numEpochs);
         
         learningRate = opts.learningRate(min(epoch, numel(opts.learningRate)));
         train = opts.train;
         
-        [net1, net2, config, syn_mats, z_mats] = process_epoch_dual_square(opts, config, getBatch, epoch, train, learningRate, imdb, net1, net2);
+        [net1, net2, config, syn_mats, z_mats] = process_epoch_dual(opts, config, getBatch, epoch, train, learningRate, imdb, net1, net2);
         loss = compute_loss(opts, syn_mats, net2, z_mats);
 
         
         SSD(epoch) = loss;
         
         disp(['Loss: ', num2str(SSD(epoch))]);
-        if mod(epoch, interval) == 0 || epoch == opts.numEpochs
+        if mod(epoch , interval) == 0 || epoch == opts.numEpochs
             
             syn_mat = syn_mats{1};
-            draw_figures(config, syn_mat, epoch, mean_img1, SSD, layer, 'net1', config.refsig1);
+%            config, syn_mat, iter, mean_img, SSD, layer, prefix, c)
+
+            draw_figures(config, syn_mat, epoch, mean_img1, SSD, layer, 'net1',1);
             
             z = z_mats{1};            
             generated_imgs = generate_imgs(opts, net2, z);
-            draw_figures(config, generated_imgs, epoch, mean_img2, [], layer, 'net2', config.refsig1);
+            draw_figures(config, generated_imgs, epoch, mean_img2, [], layer, 'net2',1);
             
-            if mod(epoch, inf) == 0 || epoch == opts.numEpochs || mod(epoch, 50) == 0 
+%             if mod(epoch, inf) == 0 || epoch == opts.numEpochs 
                 
-                cell_idx = randperm(numel(z_mats), 1);
-                z = z_mats{cell_idx};
-                interpolator(config, net2, z, epoch);
-                
-                model_file = [config.working_folder, num2str(config.Delta2), '_', num2str(config.refsig2),'_iter_',...
-                    num2str(epoch) ,'_model.mat'];
-                % save(model_file, 'net1', 'net2', 'z_mats', 'syn_mats', 'config');
-                save(model_file, 'net1', 'net2','z_mats', 'config');
-                saveas(h, [config.working_folder, num2str(layer, 'layer_%02d_'), '_iter_',...
-                    num2str(epoch) ,'_error.fig']);
-                saveas(h, [config.working_folder, num2str(layer, 'layer_%02d_'),num2str(config.refsig1), '_iter_',...
-                    num2str(epoch) ,'_error.png'])
-            end
+            cell_idx = randperm(numel(z_mats), 1);
+            z = z_mats{cell_idx};
+            interpolator(config, net2, z, epoch);
+
+            model_file = [config.working_folder, num2str(layer, 'layer_%02d'), '_iter_',...
+                num2str(epoch) ,'_model.mat'];
+            save(model_file, 'net1', 'net2', 'z_mats', 'syn_mats', 'config');
+
+            saveas(h, [config.working_folder, num2str(layer, 'layer_%02d_'), '_iter_',...
+                num2str(epoch) ,'_error.fig']);
+            saveas(h, [config.working_folder, num2str(layer, 'layer_%02d_'), '_iter_',...
+                num2str(epoch) ,'_error.png'])
+%             end
         end
     end
 end
