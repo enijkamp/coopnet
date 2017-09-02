@@ -19,9 +19,8 @@ end
 if isempty(cuda_root)
     vl_compilenn('EnableGPU', true, 'CudaMethod', 'nvcc');
 else
-    vl_compilenn('EnableGPU', true, 'CudaRoot', cuda_root, 'CudaMethod', cuda_method);
+    vl_compilenn('EnableGPU', true, 'CudaRoot', cuda_root, ...
+        'CudaMethod', cuda_method);
 end
-
-% vl_compilenn();
 
 cd(current_dir);

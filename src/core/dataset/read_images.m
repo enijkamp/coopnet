@@ -35,10 +35,9 @@ if numImages ~= length(files) || config.force_learn == true;
     save(img_file, 'img_mat');
 end
 
-% enabled (en)
-net.normalization.averageImage = ones(net.normalization.imageSize) ...
-    * mean(img_mat(:));
-
-for iImg = 1:length(files)
-    img_mat(:,:,:,iImg) = img_mat(:,:,:,iImg) - net.normalization.averageImage;
-end
+% net.normalization.averageImage = ones(net.normalization.imageSize) ...
+%     * mean(img_mat(:));
+% 
+% for iImg = 1:length(files)
+%     img_mat(:,:,:,iImg) = img_mat(:,:,:,iImg) - net.normalization.averageImage;
+% end

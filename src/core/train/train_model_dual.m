@@ -10,9 +10,7 @@ opts.numSubBatches = 1 ;
 opts.train = [] ;
 opts.val = [] ;
 opts.gpus = config.gpus; % which GPU devices to use (none, one, or more)
-
-%opts.learningRate = 0.001 ; % not used (en)
-
+opts.learningRate = 0.001 ;
 opts.continue = false ;
 opts.expDir = fullfile('data','exp') ;
 opts.conserveMemory = true ;
@@ -92,7 +90,7 @@ else
                 
                 cell_idx = randperm(numel(z_mats), 1);
                 z = z_mats{cell_idx};
-                %interpolator(config, net2, z, epoch);
+                interpolator(config, net2, z, epoch);
                 
                 model_file = [config.working_folder, num2str(layer, 'layer_%02d'), '_iter_',...
                     num2str(epoch) ,'_model.mat'];

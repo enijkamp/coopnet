@@ -9,12 +9,11 @@ fprintf('Learning category: %s\n', category);
 config = frame_config(category, 'em', exp_type);
 
 
-%% Setup Network 2 (Descriptor)
+%% Setup Network 2
 switch exp_type
     case 'texture'
         net2 = frame_gan();
-        %config.z_sz = [7, 7, size(net2.layers{1}.weights{1}, 4)]; % changed (en)
-        config.z_sz = [1, 1, size(net2.layers{1}.weights{1}, 4)];
+        config.z_sz = [7, 7, size(net2.layers{1}.weights{1}, 4)];
     case 'object'
         net2 = frame_gan_object();
         config.z_sz = [1, 1, size(net2.layers{1}.weights{1}, 4)];
@@ -22,8 +21,7 @@ end
 
 net2.z_sz = config.z_sz;
 
-%config.dydz_sz2 = [config.z_sz(1:2), 3];
-config.dydz_sz2 = [config.z_sz(1:2), 1];
+config.dydz_sz2 = [config.z_sz(1:2), 3];
 for l = 1:numel(net2.layers)
     if strcmp(net2.layers{l}.type, 'convt')
         f_sz = size(net2.layers{l}.weights{1});
@@ -52,13 +50,12 @@ config.layer_sets2 = numel(net2.layers):-1:1;
 
 net2.normalization.imageSize = config.dydz_sz2;
 net2.normalization.averageImage = zeros(config.dydz_sz2, 'single');
-
 config.sx = config.dydz_sz2(1);
 config.sy = config.dydz_sz2(2);
 clear z;
 
 
-%% Setup Network 1 (Generator)
+%% Setup Network 1
 switch exp_type
     case 'texture'
         net1 = convNet_texture();
