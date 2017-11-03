@@ -51,6 +51,9 @@ elseif numGpus == 1
   gpuDevice(opts.gpus)
 end
 
+% init random number generator on GPU
+parallel.gpu.rng(0, 'Philox4x32-10');
+
 if exist(opts.memoryMapFile), delete(opts.memoryMapFile) ; end
 
 % -------------------------------------------------------------------------
